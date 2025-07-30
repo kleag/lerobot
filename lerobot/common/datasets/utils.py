@@ -407,7 +407,7 @@ def check_timestamps_sync(
     This check is to make sure that each timestamps is separated to the next by 1/fps +/- tolerance to
     account for possible numerical error.
     """
-    timestamps = torch.stack([torch.tensor(t) for t in hf_dataset["timestamp"]])
+    timestamps = torch.stack([t.detach().clone() for t in hf_dataset["timestamp"]])
     diffs = torch.diff(timestamps)
     within_tolerance = torch.abs(diffs - 1 / fps) <= tolerance_s
 
@@ -425,7 +425,7 @@ def check_timestamps_sync(
         filtered_indices = original_indices[mask]
         outside_tolerance_filtered_indices = torch.nonzero(~filtered_within_tolerance)  # .squeeze()
         outside_tolerance_indices = filtered_indices[outside_tolerance_filtered_indices]
-        episode_indices = torch.stack([torch.tensor(t) for t in hf_dataset["episode_index"]])
+        episode_indices = torch.stack([t.detach().clone() for t in hf_dataset["episode_index"]])
 
         outside_tolerances = []
         for idx in outside_tolerance_indices:
